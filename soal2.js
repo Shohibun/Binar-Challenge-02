@@ -1,7 +1,4 @@
 let checkTypeNumber = (givenNumber) => { 
-    console.log("\n"); // melakukan enter 
-    console.log(typeof(givenNumber)); // melakukan output tipe data pada parameter (givenNumber)
-
     if (givenNumber == null) { 
         return "Error : Bro where is the parameter ?"
     }
@@ -27,7 +24,6 @@ let checkTypeNumber = (givenNumber) => {
 
 };
 
-console.log('Hasil dari pengecekan parameter:');
 console.log(checkTypeNumber(10));
 console.log(checkTypeNumber(3));
 console.log(checkTypeNumber("3"));
