@@ -1,6 +1,6 @@
 let checkEmail = (email) => {
     let regex = /.co.id/;
-    let secondRegex = /com/;
+    let secondRegex = /.com/;
     let thirdRegex = /@/;
 
     if (email == null) {
