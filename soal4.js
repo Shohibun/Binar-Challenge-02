@@ -8,7 +8,7 @@ const isiValidPassword = (givenPassword) => {
     }
 
     else if (Number.isInteger(givenPassword)) {
-        return "ERROR : parameter is a number and cannot be matched with string";
+        return "ERROR : parameter is a number";
     }
 
     else {
