@@ -4,11 +4,11 @@ let getInfoPenjualan = (dataPenjualan) => {
     let jumlahNoverlTerjual = [];
     let sisaStok = [];
     let modalStok = [];
+    let totalKeuntungan;
+    let presentaseKeuntungan;
     let keuntungan = 0;
     let modalBeli = 0;
-    let totalKeuntungan = 0;
     let totalModal = 0;
-    let presentaseKeuntungan = 0;
 
 
 //==========================MENGUMPULKAN DATA=========================
