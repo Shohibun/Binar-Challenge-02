@@ -1,43 +1,130 @@
-let getTotalPenjualan = (dataPenjualan) => {
-    let arr = []; // dikumpulan disini terlebih dahulu untuk data totalTerjual 
-    let total = 0;
+let getInfoPenjualan = (dataPenjualan) => {
+    let penjualan = [];
+    let pembelian = [];
+    let jumlahNoverlTerjual = [];
+    let sisaStok = [];
+    let modalStok = [];
+    let novelPenulisSama = [];
+    let totalKeuntungan;
+    let presentaseKeuntungan;
+    let keuntungan = 0;
+    let modalBeli = 0;
+    let totalModal = 0;
 
-    for (let i = 0; i < dataPenjualan.length; i++) {
-        arr.push(dataPenjualan[i].totalTerjual);
+
+//==========================MENGUMPULKAN DATA=========================
+
+    for (let i = 0; i < dataPenjualan.length; i++) { // data hargaJual 
+        penjualan.push(dataPenjualan[i].hargaJual);
     }
 
-    for (let i = 0; i < arr.length; i++) {
-        total += arr[i]; // ditambahkan semua data totalTerjual
-    }   
-    return total;
-}
+    for (let i = 0; i < dataPenjualan.length; i++) { // data hargaBeli
+        pembelian.push(dataPenjualan[i].hargaBeli);
+    }
 
-const dataPenjualanPakAldi = [
+    for (let i = 0; i < dataPenjualan.length; i++) { // data totalTerjual 
+        jumlahNoverlTerjual.push(dataPenjualan[i].totalTerjual);
+    }
+
+    for (let i = 0; i < dataPenjualan.length; i++) { // data sisaStok
+        sisaStok.push(dataPenjualan[i].sisaStok);
+    }
+
+    for (let i = 0; i < dataPenjualan.length; i++) { // data gabungan antaran sisaStok dan totalTerjual
+        modalStok.push(sisaStok[i] + jumlahNoverlTerjual[i]); 
+    }
+
+    for (let i = 0; i < dataPenjualan.length; i++) {
+        novelPenulisSama.push({"penulis": dataPenjualan[i].penulis, "totalTerjual": dataPenjualan[i].totalTerjual});
+    }
+
+//==========================MENGEKSEKUSI==============================
+
+    let penulisnya = novelPenulisSama.reduce((a, b) =>
+    a.set(b.penulis, (a.get(b.penulis) || 0) + Number(b.totalTerjual)), new Map);
+
+    // data keuntungan dan modalBeli (hargaBeli * totalTerjual (jadi gak ikut dengan sisaStok)) => total keuntungan
+    for (let i = 0; i < dataPenjualan.length; i++) {  
+        keuntungan += (penjualan[i] * jumlahNoverlTerjual[i]);
+        modalBeli += (pembelian[i] * jumlahNoverlTerjual[i]); 
+    }
+
+    for (let i = 0; i < dataPenjualan.length; i++) { // mengeksekusi totalModal 
+        totalModal += (pembelian[i] * modalStok[i]); 
+    }
+
+    // jika menggunakan -i -1 tidak perlu dilakukan sorting lagi disebelah kanan/bilangan terbesar, karena sudah dilakukan sebelumnya
+    for (let i = 0; i < dataPenjualan.length; i++) { // mensorting dulu dan melakukan eksekusi untuk barang terlaris
+        for (let j = 0; j < dataPenjualan.length - i - 1; j++) {
+            if (dataPenjualan[j].totalTerjual > dataPenjualan[j + 1].totalTerjual) {
+                let temp = dataPenjualan[j];
+                dataPenjualan[j] = dataPenjualan[j + 1];
+                dataPenjualan[j + 1] = temp;
+            }
+        }
+    }
+
+    let n = dataPenjualan.length;
+    let result = dataPenjualan[n - 1];
+    totalKeuntungan = keuntungan - modalBeli;
+    presentaseKeuntungan = Math.floor((totalKeuntungan / modalBeli) * 100); // math.floor convert float to integer to up
+
+    const format = totalKeuntungan.toString().split('').reverse().join(''); // membuat total keuntungan menjadi rupiah
+    const convert = format.match(/\d{1,3}/g);
+    const rupiah = 'Rp ' + convert.join('.').split('').reverse().join('');
+
+    const secondFormat = totalModal.toString().split('').reverse().join(''); // membuat total modal menjadi rupiah
+    const secondConvert = secondFormat.match(/\d{1,3}/g);
+    const secondRupiah = 'Rp ' + secondConvert.join('.').split('').reverse().join('');
+
+    const persen = presentaseKeuntungan + '%'; // membuat presentase keuntungan menjadi persen
+
+    return {
+        totalKeuntungan: rupiah, 
+        totalModal: secondRupiah,
+        presentaseKeuntungan: persen, 
+        produkBukuTerlaris: result.namaProdcut,
+        penulisBukuTerlaris: [...penulisnya.entries()].reduce((a, e ) => e[1] > a[1] ? e : a)[0]
+    }
+};
+
+const dataPenjualanNovel = [
     {
-        namaProduct: 'Sepatu Futsal Nike Vapor Academy B',
-        hargaSatuan: 760000,
-        kategori: 'Sepatu Sport', 
-        totalTerjual: 90,
+        idProduct: 'BOOK002421', 
+        namaProdcut: 'Pulan - Pergi', 
+        penulis: 'Tere Liye', 
+        hargaBeli: 60000, 
+        hargaJual: 86000, 
+        totalTerjual: 150, 
+        sisaStok: 17,  
     }, 
     {
-        namaProduct: 'Sepatu Warrior Tristan Black Brown High',
-        hargaSatuan: 960000,
-        kategori: 'Sepatu Sneaker', 
-        totalTerjual: 37,
+        idProduct: 'BOOK002351', 
+        namaProdcut: 'Selamat Tinggal', 
+        penulis: 'Tere Liye', 
+        hargaBeli: 75000, 
+        hargaJual: 103000, 
+        totalTerjual: 171, 
+        sisaStok: 20,  
     }, 
     {
-        namaProduct: 'Sepatu Warrior Tristan Maroon High',
-        hargaSatuan: 360000,
-        kategori: 'Sepatu Sneaker', 
-        totalTerjual: 90,
+        idProduct: 'BOOK002941', 
+        namaProdcut: 'Garis Waktu', 
+        penulis: 'Fiersa Besari', 
+        hargaBeli: 67000, 
+        hargaJual: 99000, 
+        totalTerjual: 213, 
+        sisaStok: 5,  
     }, 
     {
-        namaProduct: 'Sepatu Warrior Rainbow Tosca Corduroy',
-        hargaSatuan: 120000,
-        kategori: 'Sepatu Sneaker', 
-        totalTerjual: 90,
+        idProduct: 'BOOK002941', 
+        namaProdcut: 'Laskar Pelangi', 
+        penulis: 'Andrea Hirata', 
+        hargaBeli: 55000, 
+        hargaJual: 68000, 
+        totalTerjual: 20, 
+        sisaStok: 56,  
     }
 ];
 
-console.log(getTotalPenjualan(dataPenjualanPakAldi));
-
+console.log(getInfoPenjualan(dataPenjualanNovel));
